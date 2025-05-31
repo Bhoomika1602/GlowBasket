@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="card-title mb-4" style="color: #6d4c41;">Choose Payment Method</h3>
+                    
+                    <!-- Order Summary -->
+                    <div class="order-summary mb-4">
+                        <div class="alert alert-info">
+                            <h5 class="alert-heading">Order Summary</h5>
+                            <p class="mb-0">Order ID: #{{ payment.order.id }}</p>
+                            <p class="mb-0">Total Amount: ${{ total_amount }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Payment Options -->
+                    <div class="payment-options">
+                        <div class="row g-4">
+                            <!-- UPI Payment -->
+                            <div class="col-md-6">
+                                <a href="{% url 'upi_payment' payment.id %}" class="text-decoration-none">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-phone-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                                            <h5 class="card-title" style="color: #6d4c41;">UPI Payment</h5>
+                                            <p class="card-text text-muted">Pay using any UPI app</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+
+                            <!-- Cash on Delivery -->
+                            <div class="col-md-6">
+                                <a href="{% url 'cod_payment' payment.id %}" class="text-decoration-none">
+                                    <div class="card h-100 border-0 shadow-sm hover-card">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-cash-stack text-success mb-3" style="font-size: 2rem;"></i>
+                                            <h5 class="card-title" style="color: #6d4c41;">Cash on Delivery</h5>
+                                            <p class="card-text text-muted">Pay when you receive</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support Section -->
+                    <div class="support-section mt-4 text-center">
+                        <p class="text-muted">
+                            Need help? Contact our support at 
+                            <a href="mailto:support@glowbasket.com" style="color: #8d674a;">support@glowbasket.com</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: transform 0.2s ease-in-out;
+    }
+    .hover-card:hover {
+        transform: translateY(-5px);
+    }
+    .card {
+        border-radius: 10px;
+    }
+    .text-primary {
+        color: #8d674a !important;
+    }
+    .text-success {
+        color: #6d4c41 !important;
+    }
+</style>
+{% endblock %} 

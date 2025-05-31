@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Your Orders</h1>
+<ul>
+  {% for order in orders %}
+    <li>Order #{{ order.id }} - {{ order.created_at }}
+      <ul>
+        {% for item in order.items.all %}
+          <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+        {% endfor %}
+      </ul>
+    </li>
+  {% empty %}
+    <li>No completed orders.</li>
+  {% endfor %}
+</ul>
+<a href="{% url 'product_list' %}">Shop More</a>
+{% endblock %} 

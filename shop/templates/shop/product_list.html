@@ -1,0 +1,508 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- Search and Filter Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h1 class="mb-0" style="color:#6d4c41;">Our Products</h1>
+                <form method="get" class="d-flex gap-2 flex-grow-1 justify-content-end" style="max-width: 600px;">
+                    <input type="text" name="q" class="form-control" placeholder="Search products..." value="{{ query }}">
+                    <select name="category" class="form-select" style="width: auto;" onchange="this.form.submit()">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.id }}" {% if selected_category == cat.id|stringformat:'s' %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% if show_all %}
+            {% for product in products %}
+                <div class="col">
+                    <div class="card h-100 product-card">
+                        <div class="product-image-container">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="no-image-placeholder">No Image</div>
+                            {% endif %}
+                            <div class="product-overlay">
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-light btn-sm">Quick View</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="product-category mb-2">{{ product.category.name }}</div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-truncate">{{ product.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">${{ product.price }}</span>
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            {% for product in products|slice:":8" %}
+                <div class="col">
+                    <div class="card h-100 product-card">
+                        <div class="product-image-container">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="no-image-placeholder">No Image</div>
+                            {% endif %}
+                            <div class="product-overlay">
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-light btn-sm">Quick View</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="product-category mb-2">{{ product.category.name }}</div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-truncate">{{ product.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">${{ product.price }}</span>
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- View All Products Button -->
+    {% if not show_all and products|length > 8 %}
+    <div class="text-center mt-5">
+        <a href="{% url 'product_list' %}?show_all=true{% if query %}&q={{ query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}" class="btn btn-outline-primary btn-lg">View All Products</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .product-card {
+        transition: all 0.3s ease;
+        border: none;
+        box-shadow: 0 2px 8px rgba(184,155,133,0.08);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 4px 20px rgba(184,155,133,0.18);
+    }
+    
+    .product-image-container {
+        height: 250px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fffaf6;
+        position: relative;
+    }
+    
+    .product-image-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        padding: 1rem;
+        transition: transform 0.5s ease;
+    }
+    
+    .product-card:hover .product-image-container img {
+        transform: scale(1.1);
+    }
+    
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(141, 103, 74, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    .product-card:hover .product-overlay {
+        opacity: 1;
+    }
+    
+    .product-category {
+        color: #8d674a;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+    
+    .card-title {
+        color: #6d4c41;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        transition: color 0.3s ease;
+    }
+    
+    .product-card:hover .card-title {
+        color: #8d674a;
+    }
+    
+    .price {
+        color: #8d674a;
+        font-weight: 600;
+        font-size: 1.2rem;
+    }
+    
+    .card-text {
+        color: #666;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+    
+    .btn-primary {
+        transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(141, 103, 74, 0.2);
+    }
+    
+    .no-image-placeholder {
+        color: #8d674a;
+        font-size: 0.9rem;
+    }
+    
+    @media (max-width: 768px) {
+        .product-image-container {
+            height: 200px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block featured %}
+<div id="featured" class="my-5">
+    <h2 class="mb-4 text-center" style="color:#6d4c41;">Featured Products</h2>
+    <div id="featuredCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            {% for product in featured_products|slice:':6' %}
+                {% if forloop.counter0|divisibleby:3 %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <div class="row row-cols-1 row-cols-md-3 g-4">
+                {% endif %}
+                <div class="col">
+                    <div class="card h-100 product-card">
+                        <div class="product-image-container">
+                            {% if product.image %}
+                                <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                            {% else %}
+                                <div class="no-image-placeholder">No Image</div>
+                            {% endif %}
+                            <div class="product-overlay">
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-light btn-sm">Quick View</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="product-category mb-2">{{ product.category.name }}</div>
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text text-truncate">{{ product.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="price">${{ product.price }}</span>
+                                <a href="{% url 'product_detail' product.pk %}" class="btn btn-primary">View Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% if forloop.counter|divisibleby:3 or forloop.last %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+</div>
+
+<style>
+    /* Existing styles ... */
+    
+    /* Carousel Styles */
+    .carousel {
+        padding: 0 40px;
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+        background-color: #8d674a;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0.8;
+    }
+    
+    .carousel-control-prev {
+        left: 0;
+    }
+    
+    .carousel-control-next {
+        right: 0;
+    }
+    
+    .carousel-control-prev:hover,
+    .carousel-control-next:hover {
+        opacity: 1;
+        background-color: #6d4c41;
+    }
+    
+    .carousel-item {
+        padding: 20px 0;
+    }
+    
+    .carousel-item .row {
+        margin: 0;
+    }
+</style>
+
+<!-- Add Bootstrap JS and Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+{% endblock %}
+
+{% block newsletter %}
+<div class="newsletter">
+  <h3 style="color:#6d4c41;">Get Beauty Tips & Offers</h3>
+  <form method="post" action="#">
+    <input type="email" name="email" placeholder="Your email address" required>
+    <button type="submit" class="btn btn-success">Subscribe</button>
+  </form>
+  <small class="text-muted">No spam. Unsubscribe anytime.</small>
+</div>
+{% endblock %}
+
+{% block blog %}
+<div class="blog-section">
+    <h3 class="text-center mb-4" style="color:#6d4c41;">Beauty Tips & Trends</h3>
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="col">
+            <div class="card h-100 blog-card">
+                <div class="card-body">
+                    <div class="blog-category mb-2">Skincare</div>
+                    <h5 class="card-title">5 Essential Skincare Habits for Glowing Skin</h5>
+                    <p class="card-text">Discover the daily habits that make your skin radiant. From double cleansing to proper hydration, learn the secrets to achieving that natural glow.</p>
+                    <div class="blog-meta">
+                        <small class="text-muted">5 min read</small>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#skincareModal">
+                            Read More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 blog-card">
+                <div class="card-body">
+                    <div class="blog-category mb-2">Makeup</div>
+                    <h5 class="card-title">2025 Makeup Trends: What's Hot</h5>
+                    <p class="card-text">From glass skin to bold lips, explore the latest makeup trends that are taking the beauty world by storm. Get inspired for your next look!</p>
+                    <div class="blog-meta">
+                        <small class="text-muted">4 min read</small>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#makeupModal">
+                            Read More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card h-100 blog-card">
+                <div class="card-body">
+                    <div class="blog-category mb-2">Hair Care</div>
+                    <h5 class="card-title">Natural Hair Care Remedies</h5>
+                    <p class="card-text">Learn about effective natural ingredients for healthy hair. From DIY masks to proper hair care routines, get tips for luscious locks.</p>
+                    <div class="blog-meta">
+                        <small class="text-muted">6 min read</small>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-toggle="modal" data-bs-target="#haircareModal">
+                            Read More
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Skincare Modal -->
+<div class="modal fade" id="skincareModal" tabindex="-1" aria-labelledby="skincareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="skincareModalLabel">5 Essential Skincare Habits for Glowing Skin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="blog-category mb-3">Skincare</div>
+                <h4>Essential Tips for Radiant Skin</h4>
+                <ol class="mt-4">
+                    <li class="mb-4">
+                        <h5>Double Cleansing</h5>
+                        <p>Start with an oil-based cleanser to remove makeup and sunscreen, followed by a water-based cleanser to clean your skin thoroughly. This ensures all impurities are removed without stripping your skin.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Proper Hydration</h5>
+                        <p>Use a hydrating toner and essence to prepare your skin for better product absorption. Look for ingredients like hyaluronic acid and glycerin for optimal hydration.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Vitamin C Serum</h5>
+                        <p>Apply vitamin C serum in the morning to brighten your skin and protect against environmental damage. This powerful antioxidant helps fade dark spots and even out skin tone.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Moisturize Properly</h5>
+                        <p>Choose a moisturizer suitable for your skin type. Apply it while your skin is still slightly damp to lock in moisture. Don't forget to moisturize your neck as well!</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Sun Protection</h5>
+                        <p>Never skip sunscreen! Apply a broad-spectrum SPF 30 or higher every morning, even on cloudy days. Reapply every 2-3 hours if you're outdoors.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Makeup Modal -->
+<div class="modal fade" id="makeupModal" tabindex="-1" aria-labelledby="makeupModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="makeupModalLabel">2025 Makeup Trends: What's Hot</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="blog-category mb-3">Makeup</div>
+                <h4>Trending Makeup Looks for 2025</h4>
+                <ol class="mt-4">
+                    <li class="mb-4">
+                        <h5>Glass Skin Effect</h5>
+                        <p>Achieve the perfect dewy, translucent look with lightweight foundations and strategic highlighting. Focus on skincare prep and use products that enhance natural radiance.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Bold Lips</h5>
+                        <p>Vibrant, saturated lip colors are making a comeback. Try deep reds, rich berries, or bright corals. Matte finishes are particularly popular this season.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Graphic Eyeliner</h5>
+                        <p>Experiment with bold, artistic eyeliner looks. From double wings to geometric shapes, this trend allows for creative expression and dramatic eye looks.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Natural Brows</h5>
+                        <p>Full, fluffy brows are still in style. Use a brow gel to create a natural, brushed-up look that frames your face beautifully.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Hair Care Modal -->
+<div class="modal fade" id="haircareModal" tabindex="-1" aria-labelledby="haircareModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="haircareModalLabel">Natural Hair Care Remedies</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="blog-category mb-3">Hair Care</div>
+                <h4>Natural Solutions for Healthy Hair</h4>
+                <ol class="mt-4">
+                    <li class="mb-4">
+                        <h5>Coconut Oil Treatment</h5>
+                        <p>Warm coconut oil and apply it to your hair from roots to tips. Leave it on for 30 minutes to overnight for deep conditioning. This helps reduce protein loss and adds shine.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Apple Cider Vinegar Rinse</h5>
+                        <p>Mix 2-3 tablespoons of apple cider vinegar with water and use as a final rinse after shampooing. This helps balance pH levels and adds shine to your hair.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Avocado Hair Mask</h5>
+                        <p>Mash a ripe avocado with olive oil and honey. Apply to damp hair and leave for 20-30 minutes. This natural mask provides deep moisture and nutrients.</p>
+                    </li>
+                    <li class="mb-4">
+                        <h5>Proper Brushing Technique</h5>
+                        <p>Start from the ends and work your way up to prevent breakage. Use a wide-tooth comb for wet hair and a natural bristle brush for dry hair.</p>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Existing styles ... */
+    
+    /* Modal Styles */
+    .modal-content {
+        border: none;
+        border-radius: 15px;
+    }
+    
+    .modal-header {
+        background-color: #f7ede2;
+        border-bottom: none;
+        border-radius: 15px 15px 0 0;
+    }
+    
+    .modal-title {
+        color: #6d4c41;
+        font-weight: 600;
+    }
+    
+    .modal-body {
+        padding: 2rem;
+    }
+    
+    .modal-body h4 {
+        color: #6d4c41;
+        margin-bottom: 1.5rem;
+    }
+    
+    .modal-body h5 {
+        color: #8d674a;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .modal-body p {
+        color: #666;
+        line-height: 1.6;
+    }
+    
+    .modal-body ol {
+        padding-left: 1.2rem;
+    }
+    
+    .modal-body li {
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %} 
