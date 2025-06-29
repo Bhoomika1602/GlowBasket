@@ -1,0 +1,34 @@
+databases:
+  - name: ecommerce-db
+    databaseName: ecommerce_db
+    user: ecommerce_user
+    plan: free
+
+services:
+  - type: web
+    name: ecommerce-site
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn ecommerce_site.wsgi:application
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      - key: RENDER
+        value: true
+      - key: SECRET_KEY
+        generateValue: true
+      - key: WEB_CONCURRENCY
+        value: 4
+      - key: DATABASE_URL
+        fromDatabase:
+          name: ecommerce-db
+          property: connectionString
+      - key: DJANGO_SETTINGS_MODULE
+        value: ecommerce_site.settings
+      - key: ALLOWED_HOSTS
+        value: .onrender.com
+      - key: DEBUG
+        value: false
+    healthCheckPath: /
+    autoDeploy: true 
